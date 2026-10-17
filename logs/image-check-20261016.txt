@@ -1,0 +1,39 @@
+IMAGE rootfs.img CHECK_EXIT 0
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+/home/liu/linux_driver/project/vendor/sdk/rockdev/rootfs.img: 44215/90816 files (0.2% non-contiguous), 299116/363264 blocks
+e2fsck 1.45.5 (07-Jan-2020)
+
+IMAGE boot.img CHECK_EXIT 0
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+boot: 206/32768 files (0.5% non-contiguous), 17057/32768 blocks
+e2fsck 1.45.5 (07-Jan-2020)
+
+COMMAND ['debugfs', '-R', 'stat /lib/systemd/systemd', '/home/liu/linux_driver/project/vendor/sdk/rockdev/rootfs.img'] EXIT 0
+Inode: 11946   Type: regular    Mode:  0755   Flags: 0x80000
+Generation: 0    Version: 0x00000000:00000000
+User:     0   Group:     0   Project:     0   Size: 1551488
+File ACL: 0
+Links: 1   Blockcount: 2984
+Fragment:  Address: 0    Number: 0    Size: 0
+ ctime: 0x6ad1b314:00000000 -- Thu Oct 15 22:16:04 2026
+ atime: 0x6ad1b314:00000000 -- Thu Oct 15 22:16:04 2026
+ mtime: 0x66709cb3:00000000 -- Mon Jun 17 13:29:39 2024
+crtime: 0x6ad1b4fc:00000000 -- Thu Oct 15 22:24:12 2026
+Size of extra inode fields: 32
+Inode checksum: 0xf4cef293
+EXTENTS:
+(0-359):221388-221747, (364-365):221748-221749, (368-378):221750-221760
+debugfs 1.45.5 (07-Jan-2020)
+
+COMMAND ['debugfs', '-R', 'ls -l /usr/lib/modules', '/home/liu/linux_driver/project/vendor/sdk/rockdev/rootfs.img'] EXIT 0
+debugfs 1.45.5 (07-Jan-2020)
+/usr/lib/modules: File not found by ext2_lookup 
+

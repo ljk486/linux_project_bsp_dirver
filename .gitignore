@@ -1,0 +1,36 @@
+# Vendor SDK archives and generated SDK trees
+vendor/**/*.tgz
+vendor/**/*.tar.gz
+vendor/sdk/
+
+# Generated firmware and package artifacts
+*.img
+*.itb
+*.dtb
+*.dtbo
+*.deb
+*.rpm
+*.iso
+*.qcow2
+
+# Build output and temporary files
+build/
+out/
+tmp/
+.cache/
+*.o
+*.a
+*.so
+*.cmd
+*.d
+*.tmp
+
+# Raw serial binary captures can be retained locally, but not pushed by default
+logs/*.bin
+
+# Local tool/session settings and credentials
+.claude/settings.local.json
+*.pem
+*.key
+.env
+.env.*

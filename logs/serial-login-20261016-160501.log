@@ -1,0 +1,70 @@
+﻿root
+Password: 
+
+[1;34m 
+           OO                            OO
+           OOOO                        OOOO
+           OOOOO                     OOOOOO
+           OOOOOOO                 .OOOOOOO
+           OOOOOOOOO              OOOOOOOOO
+           OOOOOOOOOOO          OOOOOOOOOOO
+           OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+           OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+           OOOOO\    OOOOOOOOOOOO    /OOOOO
+           OOOOOOOOO    OOOOOO     OOOOOOOO
+           OOOOO/    OOOOOOOOOOOOO   \OOOOO
+           OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+           OOOOOOOOOOOOOO\￣/OOOOOOOOOOOOOO
+           OOOOOOOOOOOOOOO\/OOOOOOOOOOOOOOO
+           OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO 
+  _            _                     ____        _
+ | |    _   _ | |__    ____  _____  / ___| ____ | |_   
+ | |   | | | || '_ \  / _  ||  _  || |    / _  || __|
+ | |___| |_| || |_) || (_| || | | || |___| (_| || |_
+ |_____|\__._||_.__/  \__'_||_| |_| \____|\__'_| \__| 
+[0m
+
+Welcome to Ubuntu 20.04.6 LTS (GNU/Linux 4.19.232 aarch64)
+
+ * Documentation:  http://doc.embedfire.com
+ * Management:     http://www.embedfire.com
+
+
+System information as of Tue Jun 18 04:33:26 CST 2024
+
+System load:  [0;92m 0.01 [0m0.03 0.01  	Up time:       [92m3 min[0m		
+Memory usage: [0;92m 4 %[0m of 1964MB 	IP:            [92m[0m
+CPU temp:     [0;92m 31°C[0m           	GPU temp:     [0;92m 31°C[0m           	
+Usage of /:   [0;91m 92%[0m of 1.4G   	
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+root@lubancat:~# 
+root@lubancat:~# echo __LOGIN_OK__; uname -a; cat /etc/os-release; cat /proc/cmdline; findmnt /; lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINTS
+__LOGIN_OK__
+Linux lubancat 4.19.232 #24 SMP Thu Oct 15 21:36:41 PDT 2026 aarch64 aarch64 aarch64 GNU/Linux
+NAME="Ubuntu"
+VERSION="20.04.6 LTS (Focal Fossa)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 20.04.6 LTS"
+VERSION_ID="20.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=focal
+UBUNTU_CODENAME=focal
+BUILD_INFO="root@ubuntu Thu 15 Oct 2026 10:24:02 PM PDT"
+root=PARTUUID=614e0000-0000 earlyprintk console=tty1 console=tty1 consoleblank=0 loglevel=7 rootwait rw rootfstype=ext4 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1 switolb=1 coherent_pool=1m earlycon=uart8250,mmio32,0xfe660000 androidboot.fwver=ddr-v1.21-2d653b3476,spl-v1.14,bl31-v1.44,bl32-v2.12,uboot-10/14/2026
+TARGET SOURCE         FSTYPE OPTIONS
+/      /dev/mmcblk0p3 ext4   rw,relatime
+lsblk: unknown column: MOUNTPOINTS
+root@lubancat:~# 
+root@lubancat:~# 

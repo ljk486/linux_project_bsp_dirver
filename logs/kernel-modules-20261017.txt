@@ -1,0 +1,81 @@
+# Kernel modules verification
+
+Date: 2026-10-17
+Board: LubanCat 2 RK3568
+Serial: COM9, 1500000-8-N-1
+Kernel: 4.19.232
+
+## VM package inspection
+
+Package:
+
+`/home/liu/linux_driver/project/vendor/sdk/linux-image-4.19.232_4.19.232-24_arm64.deb`
+
+Package metadata:
+
+- Package: linux-image-4.19.232
+- Version: 4.19.232-24
+- Architecture: arm64
+- Size: 16,536,840 bytes
+- Module count: 55 `.ko` files
+
+The package contains the module directory and indexes:
+
+- `/lib/modules/4.19.232/`
+- `modules.alias`
+- `modules.alias.bin`
+- `modules.dep`
+- `modules.dep.bin`
+- `modules.order`
+
+## Board state before installation
+
+- `uname -r`: `4.19.232`
+- `linux-image-4.19.232`: not installed
+- `/lib/modules`: absent
+- Boot partition mounted at `/mnt/boot`
+- Package found at:
+  `/mnt/boot/kerneldeb/linux-image-4.19.232_4.19.232-24_arm64.deb`
+
+## Installation
+
+```text
+dpkg -i /mnt/boot/kerneldeb/linux-image-4.19.232_4.19.232-24_arm64.deb
+Setting up linux-image-4.19.232 (4.19.232-24) ...
+depmod -a 4.19.232
+```
+
+The package post-install script generated `/boot/initrd.img-4.19.232`. It also emitted a non-fatal warning that it could not identify the root filesystem type for the fsck hook.
+
+## Verification after installation
+
+```text
+Package: linux-image-4.19.232
+Status: install ok installed
+Version: 4.19.232-24
+
+/lib/modules/4.19.232 exists
+55 `.ko` files found
+```
+
+`modinfo tun` returned:
+
+```text
+filename: /lib/modules/4.19.232/kernel/drivers/net/tun.ko
+description: Universal TUN/TAP device driver
+vermagic: 4.19.232 SMP mod_unload aarch64
+```
+
+`modprobe tun` returned successfully, and `lsmod` showed:
+
+```text
+Module  Size  Used by
+tun     40960 0
+```
+
+## Conclusion
+
+1. The kernel image Debian package really contains loadable kernel modules and module indexes.
+2. Before this operation, the package had not been installed into the running rootfs.
+3. The package is now installed into the rootfs, and `/lib/modules/4.19.232` is available.
+4. `depmod`, `modinfo`, and `modprobe` were verified successfully for the `tun` module.

@@ -1,0 +1,14 @@
+﻿lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT; echo __MODULES__; find /lib/modules /usr/lib/modules -maxdepth 2 -type f 2>/dev/null | head -10; echo __BOOT__; cat /proc/version; uptime
+NAME          SIZE FSTYPE MOUNTPOINT
+mmcblk0       7.3G        
+├─mmcblk0p1     8M        
+├─mmcblk0p2   128M ext2   
+└─mmcblk0p3   7.2G ext4   /
+mmcblk0boot0    4M        
+mmcblk0boot1    4M        
+__MODULES__
+__BOOT__
+Linux version 4.19.232 (liu@ubuntu) (gcc version 6.3.1 20170404 (Linaro GCC 6.3-2017.05), GNU ld (Linaro_Binutils-2017.05) 2.27.0.20161019) #24 SMP Thu Oct 15 21:36:41 PDT 2026
+ 04:34:20 up 4 min,  1 user,  load average: 0.00, 0.02, 0.00
+root@lubancat:~# 
+root@lubancat:~# 

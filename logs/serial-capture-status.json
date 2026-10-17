@@ -1,0 +1,13 @@
+{
+    "state":  "stopped",
+    "pid":  27540,
+    "port":  "COM7",
+    "baud":  1500000,
+    "format":  "8N1; no flow control",
+    "startedAt":  "2026-10-16T15:09:38.3829696+08:00",
+    "updatedAt":  "2026-10-16T15:23:53.6508352+08:00",
+    "receivedBytes":  2,
+    "rawLog":  "D:\\linux_driver\\project\\logs\\serial-COM7-20261016-150938.bin",
+    "textLog":  "D:\\linux_driver\\project\\logs\\serial-COM7-20261016-150938.log",
+    "error":  null
+}
