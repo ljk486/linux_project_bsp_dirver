@@ -423,3 +423,161 @@ git add docs/knowledge.notes/day18-2026-10-17-day10-independent-replacement-and-
 ```bash
 git push origin main
 ```
+
+## 12. 无 TF 卡时的 OTG/TFTP 方案
+
+用户确认当前没有 TF 卡，因此回退验证改为两条路径：
+
+```text
+优先：TFTP 临时加载到 DRAM，不写 eMMC
+备用：OTG/Fastboot 临时下载，只有明确执行 boot，不执行 flash
+```
+
+### 12.1 TFTP 支持情况
+
+U-Boot 当前配置已包含：
+
+```text
+CONFIG_CMD_NET=y
+CONFIG_CMD_DHCP=y
+CONFIG_CMD_PING=y
+CONFIG_CMD_PXE=y
+CONFIG_CMD_TFTP_BOOTM=y
+CONFIG_CMD_TFTP_FLASH=y
+CONFIG_DM_ETH=y
+```
+
+RK3568 的默认启动目标顺序包含：
+
+```text
+MMC -> USB -> PXE -> DHCP
+```
+
+其中 `dhcp` 可以取得地址并发现 TFTP/PXE 启动信息；也可以在已知网络参数时直接使用 `tftpboot`。
+
+VM 中已准备只读 TFTP 文件目录：
+
+```text
+/home/liu/tftp-day10/Image-4.19.232
+/home/liu/tftp-day10/rk-kernel.dtb
+```
+
+文件大小和 SHA256：
+
+```text
+Image-4.19.232  26071048 bytes
+34dc8b071136363fdb5c49374131ee305a45d1b32befc193b7e79048b7d62d09
+
+rk-kernel.dtb  145785 bytes
+53d493f951366703b6c20ab55b80cea1ed8d79a8a4b76037103ecf7d3e1b1def
+```
+
+已在 VM 本机使用 BusyBox TFTP 客户端下载 `rk-kernel.dtb`，下载文件与源文件 SHA256 完全一致。这只证明 VM 内 TFTP 文件服务正确，不证明板端已经传输成功。
+
+VM 上按需启动的临时服务命令为：
+
+```bash
+sudo dnsmasq --no-daemon --port=0 \
+  --interface=ens33 --listen-address=192.168.189.134 \
+  --bind-interfaces --enable-tftp \
+  --tftp-root=/home/liu/tftp-day10
+```
+
+本次已确认它监听 `192.168.189.134:69`，并关闭了临时进程。Windows 主机未安装 `tftp.exe`，因此没有完成 Windows 到 VM 的反向下载测试；这不影响 U-Boot 直接访问 VM TFTP 服务的设计。
+
+当前板端网络限制：
+
+```text
+eth0: NO-CARRIER
+Link detected: no
+```
+
+当前 Windows 主机只有 Wi-Fi 和 VMware 虚拟网卡，板端没有已确认的物理以太网链路。因此 TFTP 实板验证仍是 `PENDING-HARDWARE`。启动 TFTP 服务本身不能替代板端网线、交换机或直连链路。
+
+建立实际链路后，推荐在 U-Boot 中先执行只读/临时命令：
+
+```text
+setenv ipaddr <board-ip>
+setenv serverip 192.168.189.134
+ping ${serverip}
+tftpboot ${kernel_addr_r} Image-4.19.232
+tftpboot ${fdt_addr_r} rk-kernel.dtb
+booti ${kernel_addr_r} - ${fdt_addr_r}
+```
+
+这条 `booti` 会临时使用 RAM 中的 Kernel 和 DTB；rootfs 参数需要显式保留为当前 eMMC 的：
+
+```text
+setenv bootargs 'root=/dev/mmcblk0p3 earlycon=uart8250,mmio32,0xfe660000 console=ttyFIQ0 console=tty1 rootwait rw rootfstype=ext4 loglevel=7'
+booti ${kernel_addr_r} - ${fdt_addr_r}
+```
+
+具体 `ipaddr`、`serverip`、网口编号和物理接口必须以 U-Boot 的 `dhcp`/`ping` 返回值为准，不能凭 VM 地址猜测。临时 TFTP 启动成功后，断电重启仍会从 eMMC 原始系统启动，构成回退。
+
+### 12.2 OTG/Fastboot 支持情况
+
+U-Boot 当前配置已包含：
+
+```text
+CONFIG_FASTBOOT=y
+CONFIG_USB_FUNCTION_FASTBOOT=y
+CONFIG_CMD_FASTBOOT=y
+CONFIG_FASTBOOT_BUF_ADDR=0xc00800
+CONFIG_FASTBOOT_BUF_SIZE=0x04000000
+CONFIG_FASTBOOT_FLASH=y
+CONFIG_FASTBOOT_FLASH_MMC_DEV=0
+CONFIG_CMD_USB=y
+CONFIG_CMD_USB_MASS_STORAGE=y
+CONFIG_USB_GADGET_DOWNLOAD=y
+```
+
+Fastboot 的 `boot` 回调会对下载缓冲区执行：
+
+```text
+bootm 0x00c00800
+```
+
+所以当前裸 `Image-4.19.232` 不能直接当作 `fastboot boot` 输入；`bootm` 需要可识别的 U-Boot/Android boot image。SDK 中的：
+
+```text
+kernel/boot.img
+```
+
+被 `file` 识别为 Android boot image，大小约 28 MiB，理论上比裸 Image 更接近 Fastboot 临时启动格式。但它仍未在板端通过 OTG 实测，不能标记为成功。
+
+OTG 安全边界：
+
+```text
+允许：进入 Fastboot 后 download + boot，若 U-Boot/镜像支持
+禁止：fastboot flash boot
+禁止：fastboot flash system/rootfs
+禁止：upgrade_tool di -b
+禁止：upgrade_tool di -rootfs
+```
+
+这些 `flash`/`di` 操作会写 eMMC，破坏当前唯一已验证的回退基线。
+
+当前 OTG 设备证据：
+
+```text
+Windows：只有 USB-SERIAL CH340 (COM9)
+Windows：没有 VID_2207 Rockchip 设备
+VM：lsusb 没有 VID_2207/PID_350a
+```
+
+因此 OTG 临时启动目前也是 `PENDING-HARDWARE`。必须先让板子进入相应 Rockchip Loader/Fastboot 模式，并确认设备枚举后才能继续。
+
+### 12.3 当前状态总结
+
+```text
+[已完成] U-Boot 编译配置支持 DHCP/TFTP
+[已完成] VM 准备 TFTP Kernel/DTB 文件
+[已完成] VM 本机 TFTP 文件一致性验证
+[已完成] U-Boot Fastboot 配置和 bootm 限制分析
+[PENDING-HARDWARE] 板端网线/链路和 TFTP ping
+[PENDING-HARDWARE] 板端 U-Boot tftpboot + booti
+[PENDING-HARDWARE] OTG/Fastboot 设备枚举
+[PENDING-HARDWARE] OTG 临时 boot
+```
+
+因此本轮没有把“文件已放到 VM”写成“Kernel/DTB 已传到板端”，也没有写 eMMC。
